@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.6"
+__version__ = "1.0.9"
 
 import sys
 import math
@@ -308,9 +308,9 @@ def is_beatmap(osu_file):
     '''reads the first line of osu_file and returns True if it
     matches the osu! magic string'''
     OSU_MAGIC = "osu file format v"
-    l = osu_file.next()
+    l = osu_file.readline()
     # some .osu files might include a utf-8 BOM if curl'd
-    return l.startswith(OSU_MAGIC) or l[3:].startswith(OSU_MAGIC)
+    return l.find(OSU_MAGIC) < 4
 
 
 class parser:
