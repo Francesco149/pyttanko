@@ -33,14 +33,15 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.3"
+__version__ = "1.0.6"
 
 import sys
 import math
 
-# hack to force utf-8
-reload(sys)
-sys.setdefaultencoding("utf-8")
+if sys.version_info[0] < 3:
+    # hack to force utf-8
+    reload(sys)
+    sys.setdefaultencoding("utf-8")
 
 info = sys.stderr.write
 
