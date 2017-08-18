@@ -13,6 +13,19 @@ if you need a command line interface, check out
 
 usage
 ===========
+pyttanko is a single-file module, so the simplest way to use it
+is to simply drop it in your project's folder:
+
+.. code-block:: sh
+
+    cd my/project
+    curl https://raw.githubusercontent.com/Francesco149/pyttanko/master/pyttanko.py > pyttanko.py
+
+this way, anyone who clones your project won't have to install
+pyttanko as it will be bundled
+
+if you prefer, it's also available on pip
+
 .. code-block:: sh
 
     pip install pyttanko
