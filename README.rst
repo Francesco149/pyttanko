@@ -5,7 +5,7 @@ osu! pp and difficulty calculator. pure python implementation of
 https://github.com/Francesco149/oppai-ng
 
 this is meant to be a standalone single-file module that's as
-portable as possible using only python 2.7+ builtins with no
+portable as possible using only python 2.6+ builtins with no
 extra dependencies
 
 if you need a command line interface, check out
