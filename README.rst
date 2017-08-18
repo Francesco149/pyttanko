@@ -30,7 +30,6 @@ if you prefer, it's also available on pip
 
     pip install pyttanko
 
-
 or you can also manually install like so:
 
 .. code-block:: sh
@@ -38,7 +37,6 @@ or you can also manually install like so:
     curl -L https://github.com/Francesco149/pyttanko/archive/HEAD.tar.gz -o HEAD.tar.gz
     cd pyttanko-*
     python setup.py install --user
-
 
 check out
 
