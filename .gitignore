@@ -1,0 +1,9 @@
+*.swp
+*.json
+*.tar.xz
+*.pyc
+tags
+/dist
+/build
+/test/test_suite
+*.egg-info

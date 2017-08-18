@@ -1,0 +1,3 @@
+include UNLICENSE
+recursive-exclude test *
+exclude run_test
