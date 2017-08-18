@@ -8,9 +8,9 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 import traceback
-import suite
 import sys
 import pyttanko
+from . import suite
 
 try:
     FileNotFoundError
