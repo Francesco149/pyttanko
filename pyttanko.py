@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.9"
+__version__ = "1.0.10"
 
 import sys
 import math
@@ -961,6 +961,8 @@ def acc_round(acc_percent, nobjects, misses):
         ((acc_percent * 0.01 - 1.0) * nobjects + misses) * 0.5
     )
 
+    n100 = int(n100)
+
     if n100 > nobjects - misses:
         # acc lower than all 100s, use 50s
         n100 = 0
@@ -971,6 +973,7 @@ def acc_round(acc_percent, nobjects, misses):
             ) * 0.5
         )
 
+        n50 = int(n50)
         n50 = min(max300, n50)
 
     else:
