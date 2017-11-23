@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.10"
+__version__ = "1.0.11"
 
 import sys
 import math
@@ -193,6 +193,7 @@ class beatmap:
         # i tried pre-allocating hitobjects and timing_points
         # as well as object data.
         # it didn't show any appreciable performance improvement
+        self.format_version = 1
         self.hitobjects = []
         self.timing_points = []
         '''these are assumed to be ordered by time low to high'''
@@ -274,6 +275,8 @@ class beatmap:
                     sv_multiplier = (-100.0 / t.ms_per_beat)
 
                 px_per_beat = self.sv * 100.0 * sv_multiplier
+                if self.format_version < 8:
+                    px_per_beat /= sv_multiplier
 
 
             # slider ticks
@@ -303,15 +306,6 @@ class beatmap:
 
 ''' ----------------------------------------------------------- '''
 ''' beatmap parser                                              '''
-
-def is_beatmap(osu_file):
-    '''reads the first line of osu_file and returns True if it
-    matches the osu! magic string'''
-    OSU_MAGIC = "osu file format v"
-    l = osu_file.readline()
-    # some .osu files might include a utf-8 BOM if curl'd
-    return l.find(OSU_MAGIC) < 4
-
 
 class parser:
     '''beatmap parser.
@@ -492,15 +486,21 @@ class parser:
         f = osu_file
         self.done = False
 
-        if not is_beatmap(f):
-            raise ValueError("not a valid beatmap file")
-
         section = ""
         b = bmap
         if b == None:
             b = beatmap()
         else:
             b.reset()
+
+        line = osu_file.readline()
+
+        OSU_MAGIC = "osu file format v"
+        # some .osu files might include a utf-8 BOM if curl'd
+        findres = line.strip().find(OSU_MAGIC)
+        if findres < 0 or findres >= 4:
+            raise ValueError("not a valid beatmap file")
+        b.format_version = int(line[findres+len(OSU_MAGIC):])
 
         for line in osu_file:
             self.nline += 1
