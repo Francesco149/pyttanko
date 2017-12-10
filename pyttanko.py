@@ -24,7 +24,7 @@ put pyttanko.py in your project's folder and import pyttanko
 for example usage, check out the __main__ at the bottom of the file
 you can run it like:
 
-    cat /path/to/map.osu | ./pyttanko.py
+    cat /path/to/map.osu | ./pyttanko.py +HDDT 200x 1m 95%
 
 also, check out "pydoc pyttanko" for full documentation
 -------------------------------------------------------------------
@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.13"
+__version__ = "1.0.14"
 
 import sys
 import math
@@ -1194,15 +1194,49 @@ def ppv2(
 if __name__ == "__main__":
     import traceback
 
+    mods = 0
+    acc_percent = 100.0
+    combo = 300
+    nmiss = 0
+
+    # get mods, acc, combo, misses from command line arguments
+    # format: +HDDT 95% 300x 1m
+    for arg in sys.argv:
+        if arg.startswith("+"):
+            mods = mods_from_str(arg[1:])
+        elif arg.endswith("%"):
+            acc_percent = float(arg[:-1])
+        elif arg.endswith("x"):
+            combo = int(arg[:-1])
+        elif arg.endswith("m"):
+            nmiss = int(arg[:-1])
+
+
     try:
         p = parser()
         bmap = p.map(sys.stdin)
-        stars = diff_calc().calc(bmap)
+
+        print("%s - %s [%s]" % (bmap.artist, bmap.title,
+            bmap.version))
+        stars = diff_calc().calc(bmap, mods)
         print("max combo: %d\n" % (bmap.max_combo()))
         print(stars)
+
+        # round acc percent to the closest 300/100/50 count
+        n300, n100, n50 = acc_round(acc_percent,
+            len(bmap.hitobjects), nmiss)
+
+        # ppv2 returns a tuple (pp, aim, speed, acc, percent)
         print("%g pp (%g aim, %g speed, %g acc) for %g%%" % (
-            ppv2(stars.aim, stars.speed, bmap=bmap)
-        )) # ppv2 returns a tuple (pp, aim, speed, acc, percent)
+            ppv2(
+                aim_stars=stars.aim,
+                speed_stars=stars.speed,
+                bmap=bmap,
+                n300=n300, n100=n100, n50=n50, nmiss=nmiss,
+                mods=mods,
+                combo=combo,
+            )
+        ))
 
     except KeyboardInterrupt:
         pass
