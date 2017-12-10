@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.11"
+__version__ = "1.0.12"
 
 import sys
 import math
@@ -546,6 +546,7 @@ class parser:
 MODS_NOMOD = 0
 MODS_NF = 1<<0
 MODS_EZ = 1<<1
+MODS_TOUCH_DEVICE = 1<<2
 MODS_HD = 1<<3
 MODS_HR = 1<<4
 MODS_DT = 1<<6
@@ -566,6 +567,7 @@ def mods_str(mods):
     if mods & MODS_HT != 0: res += "HT"
     if mods & MODS_HR != 0: res += "HR"
     if mods & MODS_EZ != 0: res += "EZ"
+    if mods & MODS_TOUCH_DEVICE != 0: res += "TD"
     if mods & MODS_NC != 0: res += "NC"
     if mods & MODS_DT != 0: res += "DT"
     if mods & MODS_FL != 0: res += "FL"
@@ -903,6 +905,8 @@ class diff_calc:
 
         self.speed = math.sqrt(self.speed) * STAR_SCALING_FACTOR
         self.aim = math.sqrt(self.aim) * STAR_SCALING_FACTOR
+        if mods & MODS_TOUCH_DEVICE != 0:
+            self.aim = pow(self.aim, 0.8)
 
         # total stars
         self.total = self.aim + self.speed
