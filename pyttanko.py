@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.12"
+__version__ = "1.0.13"
 
 import sys
 import math
@@ -573,6 +573,26 @@ def mods_str(mods):
     if mods & MODS_FL != 0: res += "FL"
     if mods & MODS_SO != 0: res += "SO"
     if mods & MODS_NF != 0: res += "NF"
+
+    return res
+
+
+def mods_from_str(mods_str):
+    '''get mods bitmask from their string representation
+    (touch device is TD)'''
+
+    res = 0
+
+    if "HD" in mods_str: res |= MODS_HD
+    if "HT" in mods_str: res |= MODS_HT
+    if "HR" in mods_str: res |= MODS_HR
+    if "EZ" in mods_str: res |= MODS_EZ
+    if "TD" in mods_str: res |= MODS_TOUCH_DEVICE
+    if "NC" in mods_str: res |= MODS_NC
+    if "DT" in mods_str: res |= MODS_DT
+    if "FL" in mods_str: res |= MODS_FL
+    if "SO" in mods_str: res |= MODS_SO
+    if "NF" in mods_str: res |= MODS_NF
 
     return res
 
