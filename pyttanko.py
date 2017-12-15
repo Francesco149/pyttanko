@@ -569,7 +569,7 @@ def mods_str(mods):
     if mods & MODS_EZ != 0: res += "EZ"
     if mods & MODS_TOUCH_DEVICE != 0: res += "TD"
     if mods & MODS_NC != 0: res += "NC"
-    if mods & MODS_DT != 0: res += "DT"
+    elif mods & MODS_DT != 0: res += "DT"
     if mods & MODS_FL != 0: res += "FL"
     if mods & MODS_SO != 0: res += "SO"
     if mods & MODS_NF != 0: res += "NF"
