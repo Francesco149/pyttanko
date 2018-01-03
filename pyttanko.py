@@ -473,7 +473,7 @@ class parser:
         # TODO: other modes
 
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
 
     def map(self, osu_file, bmap = None):
@@ -729,7 +729,7 @@ def d_spacing_weight(difftype, distance):
         return (0.95, False)
 
 
-    raise NotImplemented
+    raise NotImplementedError
 
 
 DECAY_BASE = [ 0.3, 0.15 ] # strain decay per interval
@@ -879,7 +879,7 @@ class diff_calc:
         )
 
         if bmap.mode != MODE_STD:
-            raise NotImplemented
+            raise NotImplementedError
 
         self.reset()
 
@@ -1035,7 +1035,7 @@ def ppv2(
         info(
             "ppv2 is only implemented for osu!std at the moment\n"
         )
-        raise NotImplemented
+        raise NotImplementedError
 
 
     if bmap != None:
@@ -1097,7 +1097,7 @@ def ppv2(
 
     else:
         info("unsupported scorev%d\n" % (score_version))
-        raise NotImplemented
+        raise NotImplementedError
 
     # global values -----------------------------------------------
     nobjects_over_2k = nobjects / 2000.0
@@ -1245,4 +1245,3 @@ if __name__ == "__main__":
             raise
         else: # beatmap parsing error, print parser state
             info("%s\n%s\n" % (traceback.format_exc(), str(p)))
-
