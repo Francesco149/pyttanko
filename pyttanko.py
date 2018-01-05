@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.15"
+__version__ = "1.0.16"
 
 import sys
 import math
@@ -577,22 +577,29 @@ def mods_str(mods):
     return res
 
 
-def mods_from_str(mods_str):
+def mods_from_str(string):
     '''get mods bitmask from their string representation
     (touch device is TD)'''
 
     res = 0
 
-    if "HD" in mods_str: res |= MODS_HD
-    if "HT" in mods_str: res |= MODS_HT
-    if "HR" in mods_str: res |= MODS_HR
-    if "EZ" in mods_str: res |= MODS_EZ
-    if "TD" in mods_str: res |= MODS_TOUCH_DEVICE
-    if "NC" in mods_str: res |= MODS_NC
-    if "DT" in mods_str: res |= MODS_DT
-    if "FL" in mods_str: res |= MODS_FL
-    if "SO" in mods_str: res |= MODS_SO
-    if "NF" in mods_str: res |= MODS_NF
+    while string != "":
+        if string.startswith("HD"): res |= MODS_HD
+        elif string.startswith("HT"): res |= MODS_HT
+        elif string.startswith("HR"): res |= MODS_HR
+        elif string.startswith("EZ"): res |= MODS_EZ
+        elif string.startswith("TD"): res |= MODS_TOUCH_DEVICE
+        elif string.startswith("NC"): res |= MODS_NC
+        elif string.startswith("DT"): res |= MODS_DT
+        elif string.startswith("FL"): res |= MODS_FL
+        elif string.startswith("SO"): res |= MODS_SO
+        elif string.startswith("NF"): res |= MODS_NF
+        else:
+            string = string[1:]
+            continue
+
+        string = string[2:]
+
 
     return res
 
