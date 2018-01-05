@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.18"
+__version__ = "1.0.19"
 
 import sys
 import math
@@ -213,7 +213,8 @@ class beatmap:
         self.version = ""
 
         self.ncircles = self.nsliders = self.nspinners = 0
-        self.hp = self.cs = self.od = self.ar = 5
+        self.hp = self.cs = self.od = 5
+        self.ar = None
         self.sv = self.tick_rate = 1.0
 
         self.hitobjects[:] = []
@@ -533,6 +534,9 @@ class parser:
                     )
 
 
+
+        if b.ar is None:
+            b.ar = b.od
 
         self.done = True
         return b
