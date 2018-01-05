@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.17"
+__version__ = "1.0.18"
 
 import sys
 import math
@@ -493,15 +493,6 @@ class parser:
         else:
             b.reset()
 
-        line = osu_file.readline()
-
-        OSU_MAGIC = "osu file format v"
-        # some .osu files might include a utf-8 BOM if curl'd
-        findres = line.strip().find(OSU_MAGIC)
-        if findres < 0 or findres >= 4:
-            raise ValueError("not a valid beatmap file")
-        b.format_version = int(line[findres+len(OSU_MAGIC):])
-
         for line in osu_file:
             self.nline += 1
             self.lastline = line
@@ -533,6 +524,14 @@ class parser:
                 self.timing(b, line)
             elif section == "HitObjects":
                 self.objects(b, line)
+            else:
+                OSU_MAGIC = "file format v"
+                findres = line.strip().find(OSU_MAGIC)
+                if findres > 0:
+                    b.format_version = int(
+                        line[findres+len(OSU_MAGIC):]
+                    )
+
 
 
         self.done = True
