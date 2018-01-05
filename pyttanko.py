@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.16"
+__version__ = "1.0.17"
 
 import sys
 import math
@@ -1203,7 +1203,7 @@ if __name__ == "__main__":
 
     mods = 0
     acc_percent = 100.0
-    combo = 300
+    combo = -1
     nmiss = 0
 
     # get mods, acc, combo, misses from command line arguments
@@ -1222,9 +1222,13 @@ if __name__ == "__main__":
     try:
         p = parser()
         bmap = p.map(sys.stdin)
+        if combo < 0:
+            combo = bmap.max_combo()
 
-        print("%s - %s [%s]" % (bmap.artist, bmap.title,
-            bmap.version))
+        print("%s - %s [%s] +%s" % (bmap.artist, bmap.title,
+            bmap.version, mods_str(mods)))
+        print("OD%g AR%g CS%g HP%g" % (bmap.od, bmap.ar, bmap.cs,
+            bmap.hp))
         stars = diff_calc().calc(bmap, mods)
         print("max combo: %d\n" % (bmap.max_combo()))
         print(stars)
