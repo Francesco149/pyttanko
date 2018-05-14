@@ -1152,7 +1152,7 @@ def ppv2(
     aim *= ar_bonus
 
     if mods & MODS_HD != 0:
-        aim *= 1.18
+        aim *= 1.02 + (11 - ar) / 50
 
     if mods & MODS_FL != 0:
         aim *= 1.45 * length_bonus
@@ -1170,6 +1170,9 @@ def ppv2(
     speed *= combo_break
     speed *= acc_bonus
     speed *= od_bonus
+
+    if mods & MODS_HD != 0:
+        speed *= 1.18
 
     # acc pp ------------------------------------------------------
     acc = pow(1.52163, od) * pow(real_acc, 24.0) * 2.83
