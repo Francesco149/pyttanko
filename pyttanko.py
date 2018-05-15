@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 '''
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.21"
+__version__ = "1.0.22"
 
 import sys
 import math
@@ -553,7 +553,7 @@ class parser:
 MODS_NOMOD = 0
 MODS_NF = 1<<0
 MODS_EZ = 1<<1
-MODS_TOUCH_DEVICE = 1<<2
+MODS_TD = MODS_TOUCH_DEVICE = 1<<2
 MODS_HD = 1<<3
 MODS_HR = 1<<4
 MODS_DT = 1<<6
