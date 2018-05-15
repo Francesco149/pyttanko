@@ -206,7 +206,7 @@ class beatmap:
         self.format_version = 1
         self.hitobjects = []
         self.timing_points = []
-        """these are assumed to be ordered by time low to high"""
+        # these are assumed to be ordered by time low to high
         self.reset()
 
 
@@ -841,9 +841,9 @@ class diff_calc:
         # this is how much the weight decays
         DECAY_WEIGHT = 0.9
 
-        """ strains are calculated by analyzing the map in chunks
-        and taking the peak strains in each chunk. this is the
-        length of a strain interval in milliseconds """
+        # strains are calculated by analyzing the map in chunks
+        # and taking the peak strains in each chunk. this is the
+        # length of a strain interval in milliseconds
         strain_step = 400.0 * speed_mul
 
         self.strains[:] = []
