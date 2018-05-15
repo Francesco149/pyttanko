@@ -75,8 +75,10 @@ MODE_STD = 0
 
 class circle:
     def __init__(self, pos=None):
-        """initializes a circle object.
-        if pos is None, it will be set to v2f()"""
+        """
+        initializes a circle object.
+        if pos is None, it will be set to v2f()
+        """
         if pos == None:
             pos = v2f()
 
@@ -92,10 +94,12 @@ class circle:
 
 class slider:
     def __init__(self, pos=None, distance=0.0, repetitions=0):
-        """initializes a slider object.
+        """
+        initializes a slider object.
 
         distance: distance travelled by one repetition (float)
-        pos: instance of v2f. if None, it will be set to v2f()"""
+        pos: instance of v2f. if None, it will be set to v2f()
+        """
         if pos == None:
             pos = v2f()
 
@@ -117,10 +121,12 @@ OBJ_SPINNER = 1<<3
 
 class hitobject:
     def __init__(self, time=0.0, objtype=OBJ_CIRCLE, data=None):
-        """initializes a new hitobject.
+        """
+        initializes a new hitobject.
 
         time: start time in milliseconds (float)
-        data: an instance of circle, slider or None"""
+        data: an instance of circle, slider or None
+        """
         self.time = time
         self.objtype = objtype
         self.data = data
@@ -159,10 +165,12 @@ normpos=%s, strains=%s, is_single=%s)""" % (
 
 class timing:
     def __init__(self, time=0.0, ms_per_beat=-100.0, change=False):
-        """initializes a timing point
+        """
+        initializes a timing point
         time: start time in milliseconds (float)
         ms_per_beat: float
-        change: if False, ms_per_beat is -100.0 * bpm_multiplier"""
+        change: if False, ms_per_beat is -100.0 * bpm_multiplier
+        """
         self.time = time
         self.ms_per_beat = ms_per_beat
         self.change = change
@@ -176,7 +184,8 @@ class timing:
 
 
 class beatmap:
-    """the bare minimum amount of data about a beatmap to perform
+    """
+    the bare minimum amount of data about a beatmap to perform
     difficulty and pp calculation
 
     fields:
@@ -188,7 +197,8 @@ class beatmap:
     hp cs od ar (float)
     sv tick_rate (float)
     hitobjects: list (hitobject)
-    timing_points: list (timing)"""
+    timing_points: list (timing)
+    """
     def __init__(self):
         # i tried pre-allocating hitobjects and timing_points
         # as well as object data.
@@ -201,8 +211,10 @@ class beatmap:
 
 
     def reset(self):
-        """resets fields to prepare the object to store a new
-        beatmap. used internally by the parser"""
+        """
+        resets fields to prepare the object to store a new
+        beatmap. used internally by the parser
+        """
         self.mode = MODE_STD
 
         self.title = ""
@@ -309,12 +321,14 @@ class beatmap:
 # beatmap parser
 
 class parser:
-    """beatmap parser.
+    """
+    beatmap parser.
 
     fields:
     lastline lastpos: last line and token touched (strings)
     nline: last line number touched
-    done: True if the parsing completed successfully"""
+    done: True if the parsing completed successfully
+    """
     def __init__(self):
         self.lastline = ""
         self.lastpos = ""
@@ -478,12 +492,14 @@ class parser:
 
 
     def map(self, osu_file, bmap = None):
-        """reads a file object and parses it into a beatmap object
+        """
+        reads a file object and parses it into a beatmap object
         which is then returned.
 
         if bmap is specified, it will be reused as a pre-allocated
         beatmap object instead of building a new one, speeding
-        up parsing slightly because of less allocations"""
+        up parsing slightly because of less allocations
+        """
         f = osu_file
         self.done = False
 
@@ -563,8 +579,10 @@ MODS_FL = 1<<10
 MODS_SO = 1<<12
 
 def mods_str(mods):
-    """gets string representation of mods, such as HDDT.
-    returns "nomod" for nomod"""
+    """
+    gets string representation of mods, such as HDDT.
+    returns "nomod" for nomod
+    """
     if mods == 0:
         return "nomod"
 
@@ -585,8 +603,10 @@ def mods_str(mods):
 
 
 def mods_from_str(string):
-    """get mods bitmask from their string representation
-    (touch device is TD)"""
+    """
+    get mods bitmask from their string representation
+    (touch device is TD)
+    """
 
     res = 0
 
@@ -612,12 +632,14 @@ def mods_from_str(string):
 
 
 def mods_apply(mods, ar = None, od = None, cs = None, hp = None):
-    """ calculates speed multiplier, ar, od, cs, hp with the given
+    """
+    calculates speed multiplier, ar, od, cs, hp with the given
     mods applied. returns (speed_mul, ar, od, cs, hp).
 
     the base stats are all optional and default to None. if a base
     stat is None, then it won't be calculated and will also be
-    returned as None."""
+    returned as None.
+    """
 
     OD0_MS = 79.5
     OD10_MS = 19.5
@@ -776,7 +798,8 @@ def d_strain(difftype, obj, prevobj, speed_mul):
 
 
 class diff_calc:
-    """difficulty calculator.
+    """
+    difficulty calculator.
 
     fields:
     total: star rating
@@ -785,7 +808,8 @@ class diff_calc:
     nsingles: number of notes that are considered singletaps by
               the difficulty calculator
     nsingles_threshold: number of taps slower or equal to the
-                        singletap threshold value"""
+                        singletap threshold value
+    """
 
     def __init__(self):
         self.strains = []
@@ -868,7 +892,8 @@ class diff_calc:
 
 
     def calc(self, bmap, mods=MODS_NOMOD, singletap_threshold=125):
-        """calculates difficulty and stores results in self.total,
+        """
+        calculates difficulty and stores results in self.total,
         self.aim, self.speed, self.nsingles,
         self.nsingles_threshold.
 
@@ -876,7 +901,8 @@ class diff_calc:
 
         singletap_threshold is the smallest milliseconds interval
         that will be considered singletappable, defaults to 125ms
-        which is 240 bpm 1/2 ((60000 / 240) / 2)"""
+        which is 240 bpm 1/2 ((60000 / 240) / 2)
+        """
 
         # non-normalized diameter where the small circle size buff
         # starts
@@ -983,8 +1009,10 @@ def acc_calc(n300, n100, n50, misses):
 
 
 def acc_round(acc_percent, nobjects, misses):
-    """rounds to the closest amount of 300s, 100s, 50s
-    returns (n300, n100, n50)"""
+    """
+    rounds to the closest amount of 300s, 100s, 50s
+    returns (n300, n100, n50)
+    """
 
     misses = min(nobjects, misses)
     max300 = nobjects - misses
@@ -1035,7 +1063,8 @@ def ppv2(
     base_od=5.0, mode=MODE_STD, mods=MODS_NOMOD, combo=None,
     n300=None, n100=0, n50=0, nmiss=0, score_version=1, bmap=None
 ):
-    """calculates ppv2
+    """
+    calculates ppv2
 
     returns (pp, aim_pp, speed_pp, acc_pp, acc_percent)
 
@@ -1044,7 +1073,8 @@ def ppv2(
     they must be provided.
 
     if combo is None, max_combo is used.
-    if n300 is None, max_combo - n100 - n50 - nmiss is used."""
+    if n300 is None, max_combo - n100 - n50 - nmiss is used.
+    """
     if mode != MODE_STD:
         info(
             "ppv2 is only implemented for osu!std at the moment\n"
