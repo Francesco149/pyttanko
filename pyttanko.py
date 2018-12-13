@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 """
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.0.22"
+__version__ = "1.1.0"
 
 import sys
 import math
@@ -1185,7 +1185,12 @@ def ppv2(
         aim *= 1.02 + (11 - ar) / 50
 
     if mods & MODS_FL != 0:
-        aim *= 1.45 * length_bonus
+        fl_bonus = 1.0 + 0.35 * min(1.0, nobjects / 200.0)
+        if nobjects > 200:
+            fl_bonus += 0.3 * min(1, (nobjects - 200) / 300.0)
+        if nobjects > 500:
+            fl_bonus += (nobjects - 500) / 1200.0
+        aim *= fl_bonus
 
     acc_bonus = 0.5 + accuracy / 2.0
     od_bonus = 0.98 + (od * od) / 2500.0
