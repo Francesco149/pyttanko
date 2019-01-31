@@ -1193,7 +1193,8 @@ def ppv2(
         aim *= fl_bonus
 
     acc_bonus = 0.5 + accuracy / 2.0
-    od_bonus = 0.98 + (od * od) / 2500.0
+    od_squared = od * od;
+    od_bonus = 0.98 + od_squared / 2500.0
 
     aim *= acc_bonus
     aim *= od_bonus
@@ -1203,9 +1204,15 @@ def ppv2(
     speed *= length_bonus
     speed *= miss_penality
     speed *= combo_break
-    speed *= acc_bonus
-    speed *= od_bonus
     speed *= ar_bonus
+
+    # scale speed with acc and od
+    acc_od_bonus = 1.0 / (
+      1.0 + math.exp(-20.0 * (accuracy + od_squared / 2310.0 - 0.8733))
+    ) / 1.89
+    acc_od_bonus += od_squared / 5000.0 + 0.49
+
+    speed *= acc_od_bonus
 
     if mods & MODS_HD != 0:
         speed *= 1.18
