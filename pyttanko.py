@@ -67,6 +67,9 @@ class v2f:
     def __repr__(self):
         return str(self)
 
+    def dot(self, other):
+        return self.x * other.x + self.y * other.y
+
 
 # -------------------------------------------------------------------------
 # beatmap utils
@@ -131,8 +134,11 @@ class hitobject:
         self.objtype = objtype
         self.data = data
         self.normpos = v2f()
+        self.angle = 0.0
         self.strains = [ 0.0, 0.0 ]
         self.is_single = False
+        self.delta_time = 0.0
+        self.d_distance = 0.0
 
 
     def typestr(self):
@@ -726,43 +732,73 @@ def mods_apply(mods, ar = None, od = None, cs = None, hp = None):
 DIFF_SPEED = 0
 DIFF_AIM = 1
 
-def d_spacing_weight(difftype, distance):
+def d_spacing_weight(difftype, distance, delta_time, prev_distance,
+    prev_delta_time, angle):
+
     # calculates spacing weight and returns (weight, is_single)
     # NOTE: is_single is only computed for DIFF_SPEED
 
-    ALMOST_DIAMETER = 90.0 # almost the normalized circle diameter
+    MIN_SPEED_BONUS = 75.0 # ~200BPM 1/4 streams
+    MAX_SPEED_BONUS = 45.0 # ~330BPM 1/4 streams
+    ANGLE_BONUS_SCALE = 90
+    AIM_TIMING_THRESHOLD = 107
+    SPEED_ANGLE_BONUS_BEGIN = 5 * math.pi / 6
+    AIM_ANGLE_BONUS_BEGIN = math.pi / 3
 
     # arbitrary thresholds to determine when a stream is spaced
     # enough that it becomes hard to alternate
-    STREAM_SPACING = 110.0
     SINGLE_SPACING = 125.0
 
+    strain_time = max(delta_time, 50.0)
+    prev_strain_time = max(prev_delta_time, 50.0)
+
     if difftype == DIFF_AIM:
-        return (pow(distance, 0.99), False)
+        result = 0.0
+        if angle is not None and angle > AIM_ANGLE_BONUS_BEGIN:
+            angle_bonus = math.sqrt(
+                max(prev_distance - ANGLE_BONUS_SCALE, 0.0) *
+                pow(math.sin(angle - AIM_ANGLE_BONUS_BEGIN), 2.0) *
+                max(distance - ANGLE_BONUS_SCALE, 0.0)
+            )
+            result = (
+                1.5 * pow(max(0.0, angle_bonus), 0.99) /
+                max(AIM_TIMING_THRESHOLD, prev_strain_time)
+            )
+        weighted_distance = pow(distance, 0.99)
+        res = max(result +
+            weighted_distance / max(AIM_TIMING_THRESHOLD, strain_time),
+            weighted_distance / strain_time)
+        return (res, False)
 
     elif difftype == DIFF_SPEED:
-        if distance > SINGLE_SPACING:
-            return (2.5, True)
-
-        elif distance > STREAM_SPACING:
-            return ((
-                1.6 + 0.9 * (distance - STREAM_SPACING) /
-                (SINGLE_SPACING - STREAM_SPACING)
-            ), False)
-
-        elif distance > ALMOST_DIAMETER:
-            return ((
-                1.2 + 0.4 * (distance - ALMOST_DIAMETER) /
-                (STREAM_SPACING - ALMOST_DIAMETER)
-            ), False)
-
-        elif distance > ALMOST_DIAMETER / 2.0:
-            return ((
-                0.95 + 0.25 * (distance - ALMOST_DIAMETER / 2.0) /
-                (ALMOST_DIAMETER / 2.0)
-            ), False)
-
-        return (0.95, False)
+        is_single = distance > SINGLE_SPACING
+        distance = min(distance, SINGLE_SPACING)
+        delta_time = max(delta_time, MAX_SPEED_BONUS)
+        speed_bonus = 1.0
+        if delta_time < MIN_SPEED_BONUS:
+            speed_bonus += pow((MIN_SPEED_BONUS - delta_time) / 40.0, 2)
+        angle_bonus = 1.0
+        if angle is not None:
+             s = math.sin(1.5 * (SPEED_ANGLE_BONUS_BEGIN - angle))
+             angle_bonus += s * s / 3.57
+             if angle < math.pi / 2.0:
+                angle_bonus = 1.28
+                if distance < ANGLE_BONUS_SCALE and angle < math.pi / 4.0:
+                    angle_bonus += (
+                        (1.0 - angle_bonus) *
+                        min((ANGLE_BONUS_SCALE - distance) / 10.0, 1.0)
+                    )
+                elif distance < ANGLE_BONUS_SCALE:
+                    angle_bonus += (
+                        (1.0 - angle_bonus) *
+                        min((ANGLE_BONUS_SCALE - distance) / 10.0, 1.0) *
+                        math.sin((math.pi / 2.0 - angle) * 4.0 / math.pi)
+                    )
+        res = (
+            (1 + (speed_bonus - 1) * 0.75) * angle_bonus *
+            (0.95 + speed_bonus * pow(distance / SINGLE_SPACING, 3.5))
+        ) / strain_time
+        return (res, is_single)
 
 
     raise NotImplementedError
@@ -784,16 +820,15 @@ def d_strain(difftype, obj, prevobj, speed_mul):
 
     # this implementation doesn't account for sliders
     if obj.objtype & (OBJ_SLIDER | OBJ_CIRCLE) != 0:
-        value, is_single = d_spacing_weight(
-            t, (obj.normpos - prevobj.normpos).len()
-        )
+        distance = (obj.normpos - prevobj.normpos).len()
+        obj.d_distance = distance
+        value, is_single = d_spacing_weight(t, distance, time_elapsed,
+            prevobj.d_distance, prevobj.delta_time, obj.angle)
         value *= WEIGHT_SCALING[t]
         if t == DIFF_SPEED:
             obj.is_single = is_single
 
 
-    # prevents retarded results for hit object spams
-    value /= max(time_elapsed, 50.0)
     obj.strains[t] = prevobj.strains[t] * decay + value
 
 
@@ -820,7 +855,9 @@ class diff_calc:
 
 
     def reset(self):
-        self.total = self.aim = self.speed = 0.0
+        self.total = 0.0
+        self.aim = self.aim_difficulty = self.aim_length_bonus = 0.0
+        self.speed = self.speed_difficulty = self.speed_length_bonus = 0.0
         self.nsingles = self.nsingles_threshold = 0
 
 
@@ -878,17 +915,19 @@ class diff_calc:
 
         # weight the top strains sorted from highest to lowest
         weight = 1.0
+        total = 0.0
         difficulty = 0.0
 
         strains = self.strains
         strains.sort(reverse=True)
 
         for strain in strains:
+            total += pow(strain, 1.2)
             difficulty += strain * weight
             weight *= DECAY_WEIGHT
 
 
-        return difficulty
+        return ( difficulty, total )
 
 
     def calc(self, bmap, mods=MODS_NOMOD, singletap_threshold=125):
@@ -939,9 +978,7 @@ class diff_calc:
         # low cs buff (credits to osuElements)
         if radius < CIRCLESIZE_BUFF_THRESHOLD:
             scaling_factor *= (
-                1.0 +
-                min(CIRCLESIZE_BUFF_THRESHOLD - radius, 5.0)
-                    / 50.0
+                1.0 + min(CIRCLESIZE_BUFF_THRESHOLD - radius, 5.0) / 30.0
             )
 
 
@@ -949,6 +986,9 @@ class diff_calc:
 
         # calculate normalized positions
         objs = bmap.hitobjects
+        prev1 = None
+        prev2 = None
+        i = 0
         for obj in objs:
             if obj.objtype & OBJ_SPINNER != 0:
                 obj.normpos = v2f(
@@ -957,14 +997,41 @@ class diff_calc:
             else:
                 obj.normpos = obj.data.pos * scaling_factor
 
+            if i >= 2:
+                v1 = prev2.normpos - prev1.normpos
+                v2 = obj.normpos - prev1.normpos
+                dot = v1.dot(v2)
+                det = v1.x * v2.y - v1.y * v2.x
+                obj.angle = abs(math.atan2(det, dot))
+            else:
+                obj.angle = None
+
+            prev2 = prev1
+            prev1 = obj
+            i+=1
+
+        b = bmap
 
         # speed and aim stars
-        b = bmap
-        self.speed = self.calc_individual(DIFF_SPEED, b, speed_mul)
-        self.aim = self.calc_individual(DIFF_AIM, b, speed_mul)
+        speed = self.calc_individual(DIFF_SPEED, b, speed_mul)
+        self.speed = speed[0]
+        self.speed_difficulty = speed[1]
 
-        self.speed = math.sqrt(self.speed) * STAR_SCALING_FACTOR
+        aim = self.calc_individual(DIFF_AIM, b, speed_mul)
+        self.aim = aim[0]
+        self.aim_difficulty = aim[1]
+
+        def length_bonus(star, diff):
+            return (
+              0.32 + 0.5 * (math.log10(diff + star) - math.log10(star))
+            )
+
+        self.aim_length_bonus = length_bonus(self.aim, self.aim_difficulty)
+        self.speed_length_bonus = (
+          length_bonus(self.speed, self.speed_difficulty)
+        )
         self.aim = math.sqrt(self.aim) * STAR_SCALING_FACTOR
+        self.speed = math.sqrt(self.speed) * STAR_SCALING_FACTOR
         if mods & MODS_TOUCH_DEVICE != 0:
             self.aim = pow(self.aim, 0.8)
 
