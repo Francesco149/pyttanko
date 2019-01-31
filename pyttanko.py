@@ -1166,12 +1166,7 @@ def ppv2(
         ar_bonus += 0.3 * (ar - 10.33)
 
     elif ar < 8.0:
-        low_ar_bonus = 0.01 * (8.0 - ar)
-
-        if mods & MODS_HD != 0:
-            low_ar_bonus *= 2.0
-
-        ar_bonus += low_ar_bonus
+        ar_bonus += 0.01 * (8.0 - ar)
 
 
     # aim pp ------------------------------------------------------
@@ -1181,8 +1176,11 @@ def ppv2(
     aim *= combo_break
     aim *= ar_bonus
 
+    hd_bonus = 1.0
     if mods & MODS_HD != 0:
-        aim *= 1.02 + (11 - ar) / 50
+        hd_bonus *= 1.0 + 0.04 * (12.0 - ar)
+
+    aim *= hd_bonus
 
     if mods & MODS_FL != 0:
         fl_bonus = 1.0 + 0.35 * min(1.0, nobjects / 200.0)
@@ -1205,6 +1203,7 @@ def ppv2(
     speed *= miss_penality
     speed *= combo_break
     speed *= ar_bonus
+    speed *= hd_bonus
 
     # scale speed with acc and od
     acc_od_bonus = 1.0 / (
@@ -1213,9 +1212,6 @@ def ppv2(
     acc_od_bonus += od_squared / 5000.0 + 0.49
 
     speed *= acc_od_bonus
-
-    if mods & MODS_HD != 0:
-        speed *= 1.18
 
     # acc pp ------------------------------------------------------
     acc = pow(1.52163, od) * pow(real_acc, 24.0) * 2.83
