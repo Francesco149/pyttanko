@@ -1163,7 +1163,7 @@ def ppv2(
     ar_bonus = 1.0
 
     if ar > 10.33:
-        ar_bonus += 0.45 * (ar - 10.33)
+        ar_bonus += 0.3 * (ar - 10.33)
 
     elif ar < 8.0:
         low_ar_bonus = 0.01 * (8.0 - ar)
@@ -1205,6 +1205,7 @@ def ppv2(
     speed *= combo_break
     speed *= acc_bonus
     speed *= od_bonus
+    speed *= ar_bonus
 
     if mods & MODS_HD != 0:
         speed *= 1.18
