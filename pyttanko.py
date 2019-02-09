@@ -778,7 +778,7 @@ def d_spacing_weight(difftype, distance, delta_time, prev_distance,
         if delta_time < MIN_SPEED_BONUS:
             speed_bonus += pow((MIN_SPEED_BONUS - delta_time) / 40.0, 2)
         angle_bonus = 1.0
-        if angle is not None:
+        if angle is not None and angle < SPEED_ANGLE_BONUS_BEGIN:
              s = math.sin(1.5 * (SPEED_ANGLE_BONUS_BEGIN - angle))
              angle_bonus += s * s / 3.57
              if angle < math.pi / 2.0:
