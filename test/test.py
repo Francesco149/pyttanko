@@ -27,8 +27,8 @@ def print_score(s):
 
 
 def run():
-    ERROR_MARGIN = 0.02
-    '''pp can be off by +- 2%
+    ERROR_MARGIN = 0.06
+    '''pp can be off by +- 6%
     margin is actually 3x for < 100pp, 2x for 100-200,
     1.5x for 200-300'''
 
