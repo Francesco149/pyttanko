@@ -816,6 +816,7 @@ def d_strain(difftype, obj, prevobj, speed_mul):
     t = difftype
     value = 0.0
     time_elapsed = (obj.time - prevobj.time) / speed_mul
+    obj.delta_time = time_elapsed
     decay = pow(DECAY_BASE[t], time_elapsed / 1000.0)
 
     # this implementation doesn't account for sliders
