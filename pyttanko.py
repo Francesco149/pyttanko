@@ -978,7 +978,7 @@ class diff_calc:
         # low cs buff (credits to osuElements)
         if radius < CIRCLESIZE_BUFF_THRESHOLD:
             scaling_factor *= (
-                1.0 + min(CIRCLESIZE_BUFF_THRESHOLD - radius, 5.0) / 30.0
+                1.0 + min(CIRCLESIZE_BUFF_THRESHOLD - radius, 5.0) / 50.0
             )
 
 
