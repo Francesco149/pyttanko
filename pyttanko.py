@@ -1288,7 +1288,7 @@ def ppv2(
     acc *= min(1.15, pow(ncircles / 1000.0, 0.3))
 
     if mods & MODS_HD != 0:
-        acc *= 1.02
+        acc *= 1.08
 
     if mods & MODS_FL != 0:
         acc *= 1.02
