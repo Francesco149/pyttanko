@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 """
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 import sys
 import math
@@ -647,8 +647,8 @@ def mods_apply(mods, ar = None, od = None, cs = None, hp = None):
     returned as None.
     """
 
-    OD0_MS = 79.5
-    OD10_MS = 19.5
+    OD0_MS = 80
+    OD10_MS = 20
     AR0_MS = 1800
     AR5_MS = 1200
     AR10_MS = 450
