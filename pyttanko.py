@@ -1270,7 +1270,8 @@ def ppv2(
     speed *= length_bonus
     speed *= miss_penality
     speed *= combo_break
-    speed *= ar_bonus
+    if ar > 10.33:
+        speed *= ar_bonus
     speed *= hd_bonus
 
     # scale speed with acc and od
