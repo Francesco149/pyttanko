@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 """
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 import sys
 import math
@@ -884,11 +884,15 @@ class diff_calc:
         # length of a strain interval in milliseconds
         strain_step = 400.0 * speed_mul
 
+        objs = bmap.hitobjects
         self.strains[:] = []
-        interval_end = strain_step
+        # first object doesn't generate a strain so we begin with
+        # an incremented interval end
+        interval_end = (
+          math.ceil(objs[0].time / strain_step) * strain_step
+        )
         max_strain = 0.0
 
-        objs = bmap.hitobjects
         t = difftype
 
         for i, obj in enumerate(objs[1:]):
@@ -913,6 +917,9 @@ class diff_calc:
 
             max_strain = max(max_strain, obj.strains[t])
 
+
+        # don't forget to add the last strain
+        self.strains.append(max_strain)
 
         # weight the top strains sorted from highest to lowest
         weight = 1.0
