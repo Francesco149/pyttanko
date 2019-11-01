@@ -11,6 +11,9 @@ extra dependencies
 if you need a command line interface, check out
 `oppai-ng <https://github.com/Francesco149/oppai-ng>`_
 
+if you need a more object oriented implementation, check out
+`oppadc <https://github.com/The-CJ/oppadc.py>`_
+
 usage
 ===========
 pyttanko is a single-file module, so the simplest way to use it
