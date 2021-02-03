@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 """
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "1.2.1"
+__version__ = "2.0.0"
 
 import sys
 import math
@@ -1199,11 +1199,11 @@ def ppv2(
     # accuracy ----------------------------------------------------
     accuracy = acc_calc(n300, n100, n50, nmiss)
     real_acc = accuracy
+    nspinners = nobjects - nsliders - ncircles
 
     if score_version == 1:
         # scorev1 ignores sliders since they are free 300s
         # for whatever reason it also ignores spinners
-        nspinners = nobjects - nsliders - ncircles
         real_acc = acc_calc(
             n300 - nsliders - nspinners, n100, n50, nmiss
         )
@@ -1226,7 +1226,10 @@ def ppv2(
     if nobjects > 2000:
         length_bonus += math.log10(nobjects_over_2k) * 0.5
 
-    miss_penality = pow(0.97, nmiss)
+    miss_penality_aim = 0.97 * pow(1 - pow(float(nmiss) / nobjects, 0.775), nmiss)
+    miss_penality_speed = (
+      0.97 * pow(1 - pow(float(nmiss) / nobjects, 0.775), pow(nmiss, 0.875))
+    )
     combo_break = pow(combo, 0.8) / pow(max_combo, 0.8)
 
     # calculate stats with mods
@@ -1235,21 +1238,22 @@ def ppv2(
     )
 
     # ar bonus ----------------------------------------------------
-    ar_bonus = 1.0
+    ar_bonus = 0.0
 
     if ar > 10.33:
-        ar_bonus += 0.3 * (ar - 10.33)
+        ar_bonus += 0.4 * (ar - 10.33)
 
     elif ar < 8.0:
-        ar_bonus += 0.01 * (8.0 - ar)
+        ar_bonus += 0.1 * (8.0 - ar)
 
 
     # aim pp ------------------------------------------------------
     aim = pp_base(aim_stars)
     aim *= length_bonus
-    aim *= miss_penality
+    if nmiss > 0:
+        aim *= miss_penality_aim
     aim *= combo_break
-    aim *= ar_bonus
+    aim *= 1.0 + min(ar_bonus, ar_bonus * (nobjects / 1000.0))
 
     hd_bonus = 1.0
     if mods & MODS_HD != 0:
@@ -1275,14 +1279,16 @@ def ppv2(
     # speed pp ----------------------------------------------------
     speed = pp_base(speed_stars)
     speed *= length_bonus
-    speed *= miss_penality
+    if nmiss > 0:
+        speed *= miss_penality_speed
     speed *= combo_break
     if ar > 10.33:
-        speed *= ar_bonus
+        speed *= 1.0 + min(ar_bonus, ar_bonus * (nobjects / 1000.0))
     speed *= hd_bonus
 
-    speed *= 0.02 + accuracy
-    speed *= 0.96 + od_squared / 1600.0
+    speed *= (0.95 + od_squared / 750.0) * pow(accuracy, (14.5 - max(od, 8.0)) / 2.0)
+    if n50 >= nobjects / 500.0:
+        speed *= pow(0.98, n50 - nobjects / 500.0)
 
     # acc pp ------------------------------------------------------
     acc = pow(1.52163, od) * pow(real_acc, 24.0) * 2.83
@@ -1300,10 +1306,10 @@ def ppv2(
     final_multiplier = 1.12
 
     if mods & MODS_NF != 0:
-        final_multiplier *= 0.90
+        final_multiplier *= max(0.9, 1.0 - 0.2 * nmiss)
 
     if mods & MODS_SO != 0:
-        final_multiplier *= 0.95
+        final_multiplier *= 1.0 - pow(float(nspinners) / nobjects, 0.85)
 
     total = (
         pow(
