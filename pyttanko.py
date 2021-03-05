@@ -33,7 +33,7 @@ domain. check the attached UNLICENSE or http://unlicense.org/
 """
 
 __author__ = "Franc[e]sco <lolisamurai@tfwno.gf>"
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 import sys
 import math
@@ -1244,7 +1244,7 @@ def ppv2(
         ar_bonus += 0.4 * (ar - 10.33)
 
     elif ar < 8.0:
-        ar_bonus += 0.1 * (8.0 - ar)
+        ar_bonus += 0.01 * (8.0 - ar)
 
 
     # aim pp ------------------------------------------------------
